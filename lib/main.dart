@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:notesapp/firebase_options.dart';
 import 'package:notesapp/views/login_view.dart';
 import 'package:notesapp/views/register_view.dart';
+import 'package:notesapp/views/verify_email_view.dart';
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +18,11 @@ void main() {
         useMaterial3: true,
       ),
       home: const HomePage(),
+      routes: {
+        '/login/' : (context) => const LoginView(),
+        '/register/' : (context) => const RegisterView(),
+        '/verifyemail' : (context) => const VerifyEmailView(),
+      },
     ),
   );
 }
@@ -38,14 +45,22 @@ class HomePage extends StatelessWidget {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               final user = FirebaseAuth.instance.currentUser;
-              if (user?.emailVerified ?? false) {
-                print('your email is verified');
+              if (user != null) {
+                if (user.emailVerified) {
+                  print('email is verified');
+                } else {
+                  return const VerifyEmailView();
+                }
               } else {
-                print('you need to verify your email address');
+                return const LoginView();
               }
-              return const Text('done');
+              return const Center(child: Column(
+                children: [
+                  Text('done'),
+                ],
+              ));
             default:
-                return const Text("Loading...");
+                return const Center(child: CircularProgressIndicator());
           }
         },
       ),
