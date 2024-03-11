@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:notesapp/constants/routes.dart';
 
 enum MenuItems { logout }
 
@@ -24,15 +25,21 @@ class _NotesViewState extends State<NotesView> {
                   final shouldLogOut = await logOutDialogueBox(context);
                   if (shouldLogOut) {
                     await FirebaseAuth.instance.signOut();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        loginRoute,
+                        (_) => false,
+                      );
+                    }
                   }
                   break;
               }
             }, itemBuilder: (context) {
               return const [
                 PopupMenuItem<MenuItems>(
-                    value: MenuItems.logout, child: Text('Log out'))
+                  value: MenuItems.logout,
+                  child: Text('Log out'),
+                )
               ];
             })
           ]),
