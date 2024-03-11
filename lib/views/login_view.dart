@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' show log;
 
-
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -39,9 +38,7 @@ class _LoginViewState extends State<LoginView> {
         children: [
           TextField(
             controller: _email,
-            decoration: const InputDecoration(
-              hintText: 'enter your email'
-            ),
+            decoration: const InputDecoration(hintText: 'enter your email'),
             enableSuggestions: false,
             autocorrect: false,
             keyboardType: TextInputType.emailAddress,
@@ -56,38 +53,41 @@ class _LoginViewState extends State<LoginView> {
             autocorrect: false,
           ),
           TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: email, 
-                  password: password,
-                );
-                log(userCredential.toString());
-                Navigator.of(context).pushNamedAndRemoveUntil('/notes/', (_) => false);
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
-                  log('user not found');
-                } else if (e.code == 'wrong-password') {
-                  log('wrong password');
-                } else {
-                  log('something else happened');
-                  log(e.code); 
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+                try {
+                  final userCredential =
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                    email: email,
+                    password: password,
+                  );
+                  log(userCredential.toString());
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/notes/',
+                    (route) => false,
+                  );
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'user-not-found') {
+                    log('user not found');
+                  } else if (e.code == 'wrong-password') {
+                    log('wrong password');
+                  } else {
+                    log('something else happened');
+                    log(e.code);
+                  }
                 }
-              }
-            },
-            child: const Text('Login', selectionColor: Colors.blue,)
-          ),
+              },
+              child: const Text(
+                'Login',
+                selectionColor: Colors.blue,
+              )),
           TextButton(
-            onPressed:  () async {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/register/', 
-                (route) => false
-              );
-            },
-            child: const Text('Not registered yet? Registere here')
-          ),
+              onPressed: () async {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil('/register/', (route) => false);
+              },
+              child: const Text('Not registered yet? Registere here')),
         ],
       ),
     );
