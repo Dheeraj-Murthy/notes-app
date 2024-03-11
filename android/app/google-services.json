@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "400731025695",
+    "project_id": "notesapp-dheerajmurthy",
+    "storage_bucket": "notesapp-dheerajmurthy.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400731025695:android:c111eafc9d4e92fa71c02a",
+        "android_client_info": {
+          "package_name": "com.msdheerajmurthy.notesapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOv86qRZ0lwgBxydpA6Jjb0j-zqF8Qow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
