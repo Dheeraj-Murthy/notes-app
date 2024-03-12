@@ -86,6 +86,13 @@ class _RegisterViewState extends State<RegisterView> {
                       'Password is too weak: \n consider using Uppercase, Lowercase, numbers and special characters to strengthen your password',
                     );
                   }
+                } else if (e.code == 'invalid-email') {
+                  if (context.mounted) {
+                    await showErrorDialogue(
+                      context,
+                      'please enter a valid email address',
+                    );
+                  }
                 } else {
                   // log(e.code);
                   if (context.mounted) {
