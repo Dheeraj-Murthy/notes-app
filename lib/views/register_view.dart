@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'dart:developer' show log;
 import 'package:notesapp/constants/routes.dart';
+import 'package:notesapp/sevices/auth/auth_exceptions.dart';
+import 'package:notesapp/sevices/auth/auth_service.dart';
 import 'package:notesapp/utilities/show_error_dialogue.dart';
 
 class RegisterView extends StatefulWidget {
@@ -59,54 +60,41 @@ class _RegisterViewState extends State<RegisterView> {
               final password = _password.text;
               try {
                 // final userCredential =
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                await AuthService.firebase().createUser(
                   email: email,
                   password: password,
                 );
-                final user = FirebaseAuth.instance.currentUser;
-                user?.sendEmailVerification();
+                AuthService.firebase().sendEmailVerification();
                 if (context.mounted) {
                   Navigator.of(context).pushNamed(verifyEmailRoute);
                 }
                 // log(userCredential.toString());
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'email-already-in-use') {
-                  // log('email already in use');
-                  if (context.mounted) {
-                    await showErrorDialogue(
-                      context,
-                      'Email Already in Use',
-                    );
-                  }
-                } else if (e.code == 'weak-password') {
-                  // log('password too weak');
-                  if (context.mounted) {
-                    await showErrorDialogue(
-                      context,
-                      'Password is too weak: \n consider using Uppercase, Lowercase, numbers and special characters to strengthen your password',
-                    );
-                  }
-                } else if (e.code == 'invalid-email') {
-                  if (context.mounted) {
-                    await showErrorDialogue(
-                      context,
-                      'please enter a valid email address',
-                    );
-                  }
-                } else {
-                  // log(e.code);
-                  if (context.mounted) {
-                    await showErrorDialogue(
-                      context,
-                      'error: $e',
-                    );
-                  }
-                }
-              } catch (e) {
+              } on EmailAlreadyInUseAuthException {
                 if (context.mounted) {
                   await showErrorDialogue(
                     context,
-                    'error: $e',
+                    'Email Already in Use',
+                  );
+                }
+              } on WeakPasswordAuthException {
+                if (context.mounted) {
+                  await showErrorDialogue(
+                    context,
+                    'Password is too weak: \n consider using Uppercase, Lowercase, numbers and special characters to strengthen your password',
+                  );
+                }
+              } on InvalidEmailAuthException {
+                if (context.mounted) {
+                  await showErrorDialogue(
+                    context,
+                    'please enter a valid email address',
+                  );
+                }
+              } on GenericAuthExceptions {
+                if (context.mounted) {
+                  await showErrorDialogue(
+                    context,
+                    'Failed to register',
                   );
                 }
               }
