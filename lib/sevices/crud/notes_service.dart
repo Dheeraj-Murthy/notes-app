@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:notesapp/extensions/list/filter.dart';
 import 'package:notesapp/sevices/crud/crud_exceptions.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -7,6 +8,7 @@ import 'package:sqflite/sqflite.dart';
 
 class NotesService {
   Database? _db;
+  DatabaseUser? _user;
 
   List<DatabaseNotes> _notes = [];
 
@@ -22,7 +24,15 @@ class NotesService {
 
   late final StreamController<List<DatabaseNotes>> _notesStreamController;
 
-  Stream<List<DatabaseNotes>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNotes>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return note.userId == currentUser.id;
+        } else {
+          throw UserShouldBeSetBeforeReadingAllNotesExceptioin();
+        }
+      });
 
   Future<void> _cacheNotes() async {
     final allnotes = await getAllNotes();
@@ -40,10 +50,15 @@ class NotesService {
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
 
-    final updateCount = await db.update(notesTable, {
-      noteColumn: text,
-      syncColumn: 0,
-    });
+    final updateCount = await db.update(
+      notesTable,
+      {
+        noteColumn: text,
+        syncColumn: 0,
+      },
+      where: 'id = ?',
+      whereArgs: [note.id],
+    );
     if (updateCount == 0) {
       throw CouldNotUpdateNoteException();
     } else {
@@ -138,13 +153,22 @@ class NotesService {
 
   //the following are the database user table functions
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     // await _ensuredbIsOpen();
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on CouldNotFindUserException {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
