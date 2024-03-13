@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:notesapp/extensions/list/filter.dart';
+import 'package:notesapp/sevices/crud/crud_constants.dart';
 import 'package:notesapp/sevices/crud/crud_exceptions.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -326,26 +327,3 @@ class DatabaseNotes {
     return 'Note: id = $id,user_id=$userId,synced to cloud = $isSyncedToCloud,notes = $notes';
   }
 }
-
-const dbName = 'notes.db';
-const notesTable = 'notes';
-const userTable = 'user';
-const idColumn = 'id';
-const emailColumn = 'email';
-const userIdColumn = 'user_id';
-const noteColumn = 'notes';
-const syncColumn = 'is_synced_to_cloud';
-const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
-        "id"	INTEGER NOT NULL,
-        "email"	TEXT NOT NULL UNIQUE,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
-const createNotesTable = '''CREATE TABLE IF NOT EXISTS "notes" (
-        "id"	INTEGER NOT NULL,
-        "user_id"	INTEGER NOT NULL,
-        "notes"	TEXT,
-        "is_synced_to_cloud"	INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY("user_id") REFERENCES "user"("id"),
-        PRIMARY KEY("id" AUTOINCREMENT),
-        PRIMARY KEY("notes")
-      );''';
