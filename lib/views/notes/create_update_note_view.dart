@@ -1,22 +1,29 @@
-import 'dart:developer';
-
+// import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:notesapp/sevices/auth/auth_service.dart';
 import 'package:notesapp/sevices/crud/notes_service.dart';
+import 'package:notesapp/utilities/generics/get_arguments.dart';
 
-class NewNotesView extends StatefulWidget {
-  const NewNotesView({super.key});
+class CreateUpdateNotesView extends StatefulWidget {
+  const CreateUpdateNotesView({super.key});
 
   @override
-  State<NewNotesView> createState() => _NewNotesViewState();
+  State<CreateUpdateNotesView> createState() => _CreateUpdateNotesViewState();
 }
 
-class _NewNotesViewState extends State<NewNotesView> {
+class _CreateUpdateNotesViewState extends State<CreateUpdateNotesView> {
   DatabaseNotes? _note;
   late final NotesService _notesService;
   late final TextEditingController _textController;
 
-  Future<DatabaseNotes> createNewNote() async {
+  Future<DatabaseNotes> createOrGetExistingNote(BuildContext context) async {
+    final widgetNote = context.getArgument<DatabaseNotes>();
+    if (widgetNote != null) {
+      _note = widgetNote;
+      _textController.text = widgetNote.notes;
+      return widgetNote;
+    }
+
     final existingNote = _note;
     if (existingNote != null) {
       return existingNote;
@@ -25,7 +32,8 @@ class _NewNotesViewState extends State<NewNotesView> {
     final email = currentUser.email!;
     final owner = await _notesService.getUser(email: email);
     final val = await _notesService.createNote(owner: owner);
-    log(val.toString());
+    // log(val.toString());
+    _note = val;
     return val;
   }
 
@@ -71,6 +79,14 @@ class _NewNotesViewState extends State<NewNotesView> {
   }
 
   @override
+  void dispose() {
+    _deleteNoteIfTextIsEmpty();
+    _saveNoteIfTextNotEmpty();
+    _textController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -78,11 +94,11 @@ class _NewNotesViewState extends State<NewNotesView> {
         backgroundColor: Colors.greenAccent,
       ),
       body: FutureBuilder(
-          future: createNewNote(),
+          future: createOrGetExistingNote(context),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.done:
-                _note = snapshot.data as DatabaseNotes;
+                // _note = snapshot.data as DatabaseNotes;
                 _setUpTextControllerListener();
                 return TextField(
                   controller: _textController,

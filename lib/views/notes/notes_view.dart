@@ -1,5 +1,5 @@
 // import 'dart:developer';
-
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:notesapp/constants/routes.dart';
 import 'package:notesapp/enums/menu_action.dart';
@@ -12,7 +12,8 @@ class NotesView extends StatefulWidget {
   const NotesView({super.key});
 
   @override
-  State<NotesView> createState() => _NotesViewState();
+  // ignore: library_private_types_in_public_api
+  _NotesViewState createState() => _NotesViewState();
 }
 
 class _NotesViewState extends State<NotesView> {
@@ -22,15 +23,15 @@ class _NotesViewState extends State<NotesView> {
   @override
   void initState() {
     _notesService = NotesService();
-    _notesService.open();
+    // _notesService.open();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _notesService.close();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class _NotesViewState extends State<NotesView> {
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.of(context).pushNamed(newNoteRoute);
+                Navigator.of(context).pushNamed(createUpdateNotesRoute);
               },
               icon: const Icon(Icons.add),
             ),
@@ -70,11 +71,13 @@ class _NotesViewState extends State<NotesView> {
               ];
             })
           ]),
+      // backgroundColor: const Color.fromARGB(255, 200, 200, 200),
       body: FutureBuilder(
         future: _notesService.getOrCreateUser(email: userEmail),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
+              log(_notesService.getAllNotes().toString());
               return StreamBuilder(
                 stream: _notesService.allNotes,
                 builder: (context, snapshot) {
@@ -83,10 +86,17 @@ class _NotesViewState extends State<NotesView> {
                     case ConnectionState.active:
                       if (snapshot.hasData) {
                         final allnotes = snapshot.data as List<DatabaseNotes>;
+                        log(allnotes.toString());
                         return NotesListView(
                           notes: allnotes,
                           onDeleteNote: (note) async {
-                            _notesService.deleteNote(id: note.id);
+                            await _notesService.deleteNote(id: note.id);
+                          },
+                          onTap: (note) async {
+                            Navigator.of(context).pushNamed(
+                              createUpdateNotesRoute,
+                              arguments: note,
+                            );
                           },
                         );
                       } else {

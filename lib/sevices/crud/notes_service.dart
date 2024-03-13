@@ -27,6 +27,7 @@ class NotesService {
   Future<void> _cacheNotes() async {
     final allnotes = await getAllNotes();
     _notes = allnotes.toList();
+    // _notes.addAll(allnotes);
     _notesStreamController.add(_notes);
   }
 
@@ -98,7 +99,7 @@ class NotesService {
       where: 'id = ?',
       whereArgs: [id],
     );
-    if (deletedCount != 1) {
+    if (deletedCount == 0) {
       throw CouldNotDeleteNoteException();
     } else {
       _notes.removeWhere((note) => note.id == id);
@@ -138,7 +139,7 @@ class NotesService {
   //the following are the database user table functions
 
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
-    await _ensuredbIsOpen();
+    // await _ensuredbIsOpen();
     try {
       final user = await getUser(email: email);
       return user;
@@ -211,7 +212,7 @@ class NotesService {
   }
 
   Future<void> close() async {
-    await _ensuredbIsOpen();
+    // await _ensuredbIsOpen();
     final db = _db;
     if (db == null) {
       throw DatabaseNotOpenException();
@@ -302,7 +303,7 @@ class DatabaseNotes {
   }
 }
 
-const dbName = 'note.db';
+const dbName = 'notes.db';
 const notesTable = 'notes';
 const userTable = 'user';
 const idColumn = 'id';
@@ -319,6 +320,8 @@ const createNotesTable = '''CREATE TABLE IF NOT EXISTS "notes" (
         "id"	INTEGER NOT NULL,
         "user_id"	INTEGER NOT NULL,
         "notes"	TEXT,
-        "is_synced_to_cloud"	INTEGER NOT NULL,
-        PRIMARY KEY("id" AUTOINCREMENT)
+        "is_synced_to_cloud"	INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY("user_id") REFERENCES "user"("id"),
+        PRIMARY KEY("id" AUTOINCREMENT),
+        PRIMARY KEY("notes")
       );''';
