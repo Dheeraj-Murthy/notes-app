@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'dart:developer' show log;
-import 'package:notesapp/constants/routes.dart';
+// import 'package:notesapp/constants/routes.dart';
 import 'package:notesapp/sevices/auth/auth_exceptions.dart';
-// import 'package:notesapp/sevices/auth/auth_service.dart';
 import 'package:notesapp/sevices/auth/bloc/auth_bloc.dart';
 import 'package:notesapp/sevices/auth/bloc/auth_events.dart';
 import 'package:notesapp/sevices/auth/bloc/auth_state.dart';
@@ -36,42 +34,42 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        backgroundColor: Colors.greenAccent,
-      ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _email,
-            decoration: const InputDecoration(hintText: 'enter your email'),
-            enableSuggestions: false,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          TextField(
-            controller: _password,
-            decoration: const InputDecoration(
-              hintText: 'enter your password',
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) async {
+        if (state is AuthStateLoggedOut) {
+          if (state.exception is UserNotFoundAuthException) {
+            await showErrorDialogue(context, 'User not found.');
+          } else if (state.exception is WrongPasswordAuthException) {
+            await showErrorDialogue(context, 'wrong credentials.');
+          } else if (state.exception is GenericAuthExceptions) {
+            await showErrorDialogue(context, 'Authentication Error');
+          }
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Login'),
+          backgroundColor: Colors.greenAccent,
+        ),
+        body: Column(
+          children: [
+            TextField(
+              controller: _email,
+              decoration: const InputDecoration(hintText: 'enter your email'),
+              enableSuggestions: false,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
             ),
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-          ),
-          BlocListener<AuthBloc, AuthState>(
-            listener: (context, state) async {
-              if (state is AuthStateLoggedOut) {
-                if (state.exception is UserNotFoundAuthException) {
-                  await showErrorDialogue(context, 'User not found.');
-                } else if (state.exception is WrongPasswordAuthException) {
-                  await showErrorDialogue(context, 'wrong credentials.');
-                } else if (state.exception is GenericAuthExceptions) {
-                  await showErrorDialogue(context, 'Authentication Error');
-                }
-              }
-            },
-            child: TextButton(
+            TextField(
+              controller: _password,
+              decoration: const InputDecoration(
+                hintText: 'enter your password',
+              ),
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+            ),
+            TextButton(
                 onPressed: () async {
                   final email = _email.text;
                   final password = _password.text;
@@ -84,16 +82,19 @@ class _LoginViewState extends State<LoginView> {
                   'Login',
                   selectionColor: Colors.blue,
                 )),
-          ),
-          TextButton(
-              onPressed: () async {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  registerRoute,
-                  (route) => false,
-                );
-              },
-              child: const Text('Not registered yet? Registere here')),
-        ],
+            TextButton(
+                onPressed: () {
+                  context.read<AuthBloc>().add(
+                        const AuthEventShouldRegister(),
+                      );
+                  // Navigator.of(context).pushNamedAndRemoveUntil(
+                  //   registerRoute,
+                  //   (route) => false,
+                  // );
+                },
+                child: const Text('Not registered yet? Registere here')),
+          ],
+        ),
       ),
     );
   }
