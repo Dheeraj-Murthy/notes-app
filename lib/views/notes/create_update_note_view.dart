@@ -7,6 +7,7 @@ import 'package:notesapp/sevices/cloud/cloud_note.dart';
 import 'package:notesapp/utilities/dialogues/cannot_share_empty_note_dialog.dart';
 // import 'package:notesapp/sevices/cloud/cloud_storage_exceptions.dart';
 import 'package:notesapp/utilities/generics/get_arguments.dart';
+import 'package:share_plus/share_plus.dart';
 
 class CreateUpdateNotesView extends StatefulWidget {
   const CreateUpdateNotesView({super.key});
@@ -103,7 +104,9 @@ class _CreateUpdateNotesViewState extends State<CreateUpdateNotesView> {
               final text = _textController.text;
               if (_note == null || text.isEmpty) {
                 await showCannotShareEmptyNoteDialog(context);
-              } else {}
+              } else {
+                Share.share(text);
+              }
             },
             icon: const Icon(Icons.share),
           ),
