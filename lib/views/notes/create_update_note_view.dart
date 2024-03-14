@@ -4,6 +4,7 @@ import 'package:notesapp/sevices/auth/auth_service.dart';
 // import 'package:notesapp/sevices/crud/notes_service.dart';
 import 'package:notesapp/sevices/cloud/firebase_cloud_storage.dart';
 import 'package:notesapp/sevices/cloud/cloud_note.dart';
+import 'package:notesapp/utilities/dialogues/cannot_share_empty_note_dialog.dart';
 // import 'package:notesapp/sevices/cloud/cloud_storage_exceptions.dart';
 import 'package:notesapp/utilities/generics/get_arguments.dart';
 
@@ -96,6 +97,17 @@ class _CreateUpdateNotesViewState extends State<CreateUpdateNotesView> {
       appBar: AppBar(
         title: const Text('New Note'),
         backgroundColor: Colors.greenAccent,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final text = _textController.text;
+              if (_note == null || text.isEmpty) {
+                await showCannotShareEmptyNoteDialog(context);
+              } else {}
+            },
+            icon: const Icon(Icons.share),
+          ),
+        ],
       ),
       body: FutureBuilder(
           future: createOrGetExistingNote(context),
