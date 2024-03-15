@@ -6,6 +6,44 @@ import 'package:notesapp/sevices/auth/bloc/auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc(AuthProvider provider)
       : super(const AuthStateUninitialised(isLoading: true)) {
+    //forgot password
+    on<AuthEventForgotPassword>(
+      (event, emit) async {
+        emit(const AuthStateForgotPassword(
+          isLoading: false,
+          exception: null,
+          hasSentEmail: false,
+        ));
+        final email = event.email;
+        if (email == null) {
+          return; // user just wants to go to forgot-password screen
+        }
+        //user wants to send a forgot-password email
+        emit(const AuthStateForgotPassword(
+          isLoading: true,
+          exception: null,
+          hasSentEmail: false,
+        ));
+
+        bool didSendEmail;
+        Exception? exception;
+        try {
+          await provider.sendPasswordReset(toEmail: email);
+          didSendEmail = true;
+          exception = null;
+        } on Exception catch (e) {
+          didSendEmail = false;
+          exception = e;
+        }
+
+        emit(AuthStateForgotPassword(
+          isLoading: false,
+          exception: exception,
+          hasSentEmail: didSendEmail,
+        ));
+      },
+    );
+
     //send email verification
     on<AuthEventSendEmailVerification>((event, emit) async {
       await provider.sendEmailVerification();
@@ -87,10 +125,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isLoading: false,
           ));
         }
-        emit(AuthStateLoggedIn(
-          user: user,
-          isLoading: false,
-        ));
       } on Exception catch (e) {
         emit(
           AuthStateLoggedOut(
@@ -119,5 +153,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         );
       }
     });
+
+    // I wrote this code myself yo: its full of bugs but i could care less about that!!!!
+    on<AuthEventShouldRegister>(
+      (event, emit) {
+        emit(const AuthStateRegistering(
+          exception: null,
+          isLoading: false,
+        ));
+      },
+    );
   }
 }

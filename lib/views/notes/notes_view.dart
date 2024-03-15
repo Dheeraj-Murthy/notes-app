@@ -40,7 +40,10 @@ class _NotesViewState extends State<NotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: const Text('myNotes'),
+            title: const Text(
+              'myNotes',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             backgroundColor: Colors.greenAccent,
             actions: [
               IconButton(

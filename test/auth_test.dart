@@ -128,4 +128,14 @@ class MockAuthProvider implements AuthProvider {
     var newUser = AuthUser(isEmailVerified: true, email: user.email, id: '123');
     _user = newUser;
   }
+
+  @override
+  Future<void> sendPasswordReset({required String toEmail}) async {
+    if (!isInitialised) {
+      throw NotInitialisedException();
+    }
+    if (toEmail == 'djkhaled@gmail.com') throw UserNotFoundAuthException();
+    _user = await createUser(email: toEmail, password: ' ');
+    throw NotInitialisedException();
+  }
 }

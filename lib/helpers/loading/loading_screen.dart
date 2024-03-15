@@ -4,7 +4,7 @@ import 'package:notesapp/helpers/loading/loading_screen_controller.dart';
 
 class LoadingScreen {
   factory LoadingScreen() => _shared;
-  static final _shared = LoadingScreen._sharedInstance();
+  static final LoadingScreen _shared = LoadingScreen._sharedInstance();
   LoadingScreen._sharedInstance();
 
   LoadingScreenController? controller;
@@ -24,7 +24,7 @@ class LoadingScreen {
   }
 
   void hide() {
-    controller?.close;
+    controller?.close();
     controller = null;
   }
 
@@ -54,7 +54,7 @@ class LoadingScreen {
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Padding(
-              padding: EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(16.0),
               child: SingleChildScrollView(
                   child: Column(
                 mainAxisSize: MainAxisSize.min,

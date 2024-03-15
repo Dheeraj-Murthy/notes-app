@@ -38,7 +38,8 @@ class _LoginViewState extends State<LoginView> {
       listener: (context, state) async {
         if (state is AuthStateLoggedOut) {
           if (state.exception is UserNotFoundAuthException) {
-            await showErrorDialogue(context, 'User not found.');
+            await showErrorDialogue(
+                context, 'Cannot find user with the entered credentials');
           } else if (state.exception is WrongPasswordAuthException) {
             await showErrorDialogue(context, 'wrong credentials.');
           } else if (state.exception is GenericAuthExceptions) {
@@ -48,52 +49,89 @@ class _LoginViewState extends State<LoginView> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Login'),
+          title: const Text(
+            'Login',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           backgroundColor: Colors.greenAccent,
         ),
-        body: Column(
-          children: [
-            TextField(
-              controller: _email,
-              decoration: const InputDecoration(hintText: 'enter your email'),
-              enableSuggestions: false,
-              autocorrect: false,
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: _password,
-              decoration: const InputDecoration(
-                hintText: 'enter your password',
+        body: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            children: [
+              const Text(''),
+              const Text(
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 2, 131, 0),
+                    fontWeight: FontWeight.bold,
+                  ),
+                  'Please log into your account to create and edit notes'),
+              const Text(''),
+              TextField(
+                controller: _email,
+                decoration: const InputDecoration(
+                  hintText: 'enter your email',
+                  border: OutlineInputBorder(),
+                ),
+                enableSuggestions: false,
+                autocorrect: false,
+                keyboardType: TextInputType.emailAddress,
               ),
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-            ),
-            TextButton(
-                onPressed: () async {
-                  final email = _email.text;
-                  final password = _password.text;
-                  context.read<AuthBloc>().add(AuthEventLogIn(
-                        email: email,
-                        password: password,
-                      ));
-                },
-                child: const Text(
-                  'Login',
-                  selectionColor: Colors.blue,
-                )),
-            TextButton(
+              TextField(
+                controller: _password,
+                decoration: const InputDecoration(
+                  hintText: 'enter your password',
+                  border: OutlineInputBorder(),
+                ),
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
+              ),
+              const Text(''),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      final email = _email.text;
+                      final password = _password.text;
+                      if (email == '' && password == '') {
+                        await showErrorDialogue(
+                          context,
+                          'email and password text boxes cannot be empty',
+                        );
+                      } else {
+                        context.read<AuthBloc>().add(AuthEventLogIn(
+                              email: email,
+                              password: password,
+                            ));
+                      }
+                    },
+                    child: const Text(
+                      'Login',
+                      selectionColor: Colors.blue,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      context.read<AuthBloc>().add(
+                            const AuthEventForgotPassword(),
+                          );
+                    },
+                    child: const Text('Forgot Password'),
+                  ),
+                ],
+              ),
+              TextButton(
                 onPressed: () {
                   context.read<AuthBloc>().add(
                         const AuthEventShouldRegister(),
                       );
-                  // Navigator.of(context).pushNamedAndRemoveUntil(
-                  //   registerRoute,
-                  //   (route) => false,
-                  // );
                 },
-                child: const Text('Not registered yet? Registere here')),
-          ],
+                child: const Text('Not registered yet? Registere here'),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -96,7 +96,10 @@ class _CreateUpdateNotesViewState extends State<CreateUpdateNotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Note'),
+        title: const Text(
+          'Note',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.greenAccent,
         actions: [
           IconButton(
@@ -125,6 +128,7 @@ class _CreateUpdateNotesViewState extends State<CreateUpdateNotesView> {
                   maxLines: null,
                   decoration: const InputDecoration(
                     hintText: 'Start typing your note...',
+                    border: InputBorder.none,
                   ),
                 );
               default:
