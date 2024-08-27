@@ -1,16 +1,16 @@
-# notesapp
+# NotesApp
 
-A new Flutter project.
+## Overview
 
-## Getting Started
+This is a full-stack Flutter project for a mobile application called 'NotesApp'. The application allows users to register and log in using their email. It also supports email authentication via an email link.
 
-This project is a starting point for a Flutter application.
+Key features include:
+- Writing, editing, and saving notes
+- Syncing notes across all devices using Firebase Cloud Storage
 
-A few resources to get you started if this is your first Flutter project:
+The project incorporates:
+- **Bloc** for state management
+- **Dart** components
+- **FlutterFire** for Firebase integration
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Firebase serves as the backend database for the application.
